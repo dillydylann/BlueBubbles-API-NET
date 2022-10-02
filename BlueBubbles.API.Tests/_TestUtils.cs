@@ -9,6 +9,14 @@ namespace BlueBubbles.API.Tests
     {
         public static void VerifyResponse<T>(APIResponse<T> resp)
         {
+            // Ehh...a normal user would be using PrivateAPIEnabled and HelperConnected in
+            // Server.GetInfo() instead of this mess...
+            if (resp.Error?.Message == "iMessage Private API is not enabled!" ||
+                resp.Error?.Message == "iMessage Private API Helper is not connected!")
+            {
+                Assert.Inconclusive("The Private API is either disabled or its helper is not connected.");
+            }
+
             Console.WriteLine($"Response status: {resp.Status}");
             Console.WriteLine($"Response message: {resp.Message}");
             if (resp.Error != null)
