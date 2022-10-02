@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using BlueBubbles.API.Interfaces;
 using JsonNet.ContractResolvers;
 using Newtonsoft.Json;
 
@@ -29,6 +30,9 @@ namespace BlueBubbles.API
         {
             ServerUrl = url ?? throw new ArgumentNullException(nameof(url));
             ServerPassword = password ?? throw new ArgumentNullException(nameof(password));
+
+            General = new GeneralImpl(this);
+            MacOS = new MacOSImpl(this);
         }
 
         /// <summary>
@@ -39,6 +43,15 @@ namespace BlueBubbles.API
         /// Gets or sets the server password.
         /// </summary>
         public string ServerPassword { get; set; }
+
+        /// <summary>
+        /// Gets the General API interface.
+        /// </summary>
+        public IGeneral General { get; }
+        /// <summary>
+        /// Gets the MacOS API interface.
+        /// </summary>
+        public IMacOS MacOS { get; }
 
         /// <summary>
         /// Initiates a synchronous request to the BlueBubbles server.
