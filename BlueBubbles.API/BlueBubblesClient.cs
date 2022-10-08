@@ -179,5 +179,16 @@ namespace BlueBubbles.API
         /// </summary>
         /// <inheritdoc cref="Request"/>
         public Task<APIResponse<TResponse>> RequestPutAsync<TResponse, TBody>(string path, TBody body) => RequestAsync<TResponse, TBody>("PUT", path, null, body);
+
+        /// <summary>
+        /// Initiates a synchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TResponse> RequestDelete<TResponse>(string path) => Request<TResponse, object>("DELETE", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TResponse>> RequestDeleteAsync<TResponse>(string path) => RequestAsync<TResponse, object>("DELETE", path, null, null);
     }
 }
