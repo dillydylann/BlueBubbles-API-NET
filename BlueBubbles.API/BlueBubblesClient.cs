@@ -38,6 +38,7 @@ namespace BlueBubbles.API
 
             General = new GeneralImpl(this);
             MacOS = new MacOSImpl(this);
+            Server = new ServerImpl(this);
         }
 
         /// <summary>
@@ -65,6 +66,10 @@ namespace BlueBubbles.API
         /// Gets the MacOS API interface.
         /// </summary>
         public IMacOS MacOS { get; }
+        /// <summary>
+        /// Gets the Server API interface.
+        /// </summary>
+        public IServer Server { get; }
 
         /// <summary>
         /// Creates a web request with the login and the specified parameters added.
