@@ -16,6 +16,11 @@ namespace BlueBubbles.API
     /// </summary>
     public sealed class BlueBubblesClient
     {
+        /// <summary>
+        /// Defines the default content type for requests.
+        /// </summary>
+        public const string DefaultContentType = "application/json";
+
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings()
         {
             ContractResolver = new PrivateSetterCamelCasePropertyNamesContractResolver(),
@@ -26,7 +31,7 @@ namespace BlueBubbles.API
         /// </summary>
         /// <param name="url">The server URL to connect to.</param>
         /// <param name="password">The password used to authenticate access to the server.</param>
-        public BlueBubblesClient(string url, string password)
+        public BlueBubblesClient(Uri url, string password)
         {
             ServerUrl = url ?? throw new ArgumentNullException(nameof(url));
             ServerPassword = password ?? throw new ArgumentNullException(nameof(password));
@@ -36,9 +41,17 @@ namespace BlueBubbles.API
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="BlueBubblesClient"/> class.
+        /// </summary>
+        /// <param name="url">The server URL to connect to.</param>
+        /// <param name="password">The password used to authenticate access to the server.</param>
+        public BlueBubblesClient(string url, string password)
+            : this(new Uri(url ?? throw new ArgumentNullException(nameof(url))), password) { }
+
+        /// <summary>
         /// Gets or sets the server URL.
         /// </summary>
-        public string ServerUrl { get; set; }
+        public Uri ServerUrl { get; set; }
         /// <summary>
         /// Gets or sets the server password.
         /// </summary>
@@ -54,6 +67,27 @@ namespace BlueBubbles.API
         public IMacOS MacOS { get; }
 
         /// <summary>
+        /// Creates a web request with the login and the specified parameters added.
+        /// </summary>
+        /// <param name="method">The protocol method to use.</param>
+        /// <param name="path">The path URL for the request.</param>
+        /// <param name="query">The query for the URL.</param>
+        /// <returns>A <see cref="HttpWebRequest"/> instance for custom response data objects.</returns>
+        public HttpWebRequest CreateRequest(string method, string path, string query)
+        {
+            var uriBuilder = new UriBuilder(ServerUrl)
+            {
+                Path = path,
+                Query = $"password={Uri.EscapeDataString(ServerPassword)}"
+                    + (!string.IsNullOrEmpty(query) ? $"&{query}" : string.Empty),
+            };
+
+            HttpWebRequest webReq = WebRequest.CreateHttp(uriBuilder.Uri);
+            webReq.Method = method;
+            return webReq;
+        }
+
+        /// <summary>
         /// Initiates a synchronous request to the BlueBubbles server.
         /// </summary>
         /// <typeparam name="TResponse">The type to use for the response model.</typeparam>
@@ -65,29 +99,49 @@ namespace BlueBubbles.API
         /// An object specified by <typeparamref name="TBody"/> to send.
         /// <see langword="null"/> if <paramref name="method"/> is set to <c>GET</c>.
         /// </param>
+        /// <param name="contentType">The body content type.</param>
         /// <returns>
         /// A response object containing the HTTP status code, a status message,
         /// the <typeparamref name="TResponse"/> data, and an error object if failed.
         /// </returns>
-        public APIResponse<TResponse> Request<TResponse, TBody>(string method, string path, string query, TBody body)
+        public APIResponse<TResponse> Request<TResponse, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
         {
-            var uriBuilder = new UriBuilder(ServerUrl)
-            {
-                Path = path,
-                Query = $"password={Uri.EscapeDataString(ServerPassword)}"
-                    + (!string.IsNullOrEmpty(query) ? $"&{query}" : string.Empty),
-            };
-
-            HttpWebRequest webReq = WebRequest.CreateHttp(uriBuilder.Uri);
-            webReq.Method = method;
+            HttpWebRequest webReq = CreateRequest(method, path, query);
 
             if (body != null)
             {
                 webReq.ContentType = "application/json";
                 using (var writer = new StreamWriter(webReq.GetRequestStream()))
                 {
+                    switch (contentType)
+                    {
+                        case "application/json":
                     writer.Write(JsonConvert.SerializeObject(body, SerializerSettings));
+                            break;
+
+                        case "multipart/form-data":
+                            Utils.WriteMultipartFormDataTo(writer.BaseStream, body, out string boundary);
+                            contentType += "; boundary=" + boundary;
+                            break;
+
+                        default:
+                            if (body is byte[] bytes)
+                            {
+                                using (var stream = webReq.GetRequestStream())
+                                {
+                                    stream.Write(bytes, 0, bytes.Length);
+                                }
+                            }
+                            else
+                            {
+                                writer.Write(body);
+                            }
+
+                            break;
+                    }
                 }
+
+                webReq.ContentType = contentType;
             }
 
             Exception exception = null;
@@ -122,9 +176,9 @@ namespace BlueBubbles.API
         /// Initiates an asynchronous request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestAsync<TResponse, TBody>(string method, string path, string query, TBody body)
+        public Task<APIResponse<TResponse>> RequestAsync<TResponse, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
         {
-            return Task.Run(() => Request<TResponse, TBody>(method, path, query, body));
+            return Task.Run(() => Request<TResponse, TBody>(method, path, query, body, contentType));
         }
 
         /// <summary>
@@ -152,12 +206,12 @@ namespace BlueBubbles.API
         /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPost<TResponse, TBody>(string path, TBody body) => Request<TResponse, TBody>("POST", path, null, body);
+        public APIResponse<TResponse> RequestPost<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TResponse, TBody>("POST", path, null, body, contentType);
         /// <summary>
         /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPostAsync<TResponse, TBody>(string path, TBody body) => RequestAsync<TResponse, TBody>("POST", path, null, body);
+        public Task<APIResponse<TResponse>> RequestPostAsync<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TResponse, TBody>("POST", path, null, body, contentType);
 
         /// <summary>
         /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
@@ -173,12 +227,12 @@ namespace BlueBubbles.API
         /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPut<TResponse, TBody>(string path, TBody body) => Request<TResponse, TBody>("PUT", path, null, body);
+        public APIResponse<TResponse> RequestPut<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TResponse, TBody>("PUT", path, null, body, contentType);
         /// <summary>
         /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPutAsync<TResponse, TBody>(string path, TBody body) => RequestAsync<TResponse, TBody>("PUT", path, null, body);
+        public Task<APIResponse<TResponse>> RequestPutAsync<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TResponse, TBody>("PUT", path, null, body, contentType);
 
         /// <summary>
         /// Initiates a synchronous <c>DELETE</c> request to the BlueBubbles server.
