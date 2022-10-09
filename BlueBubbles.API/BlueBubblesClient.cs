@@ -36,6 +36,7 @@ namespace BlueBubbles.API
             ServerUrl = url ?? throw new ArgumentNullException(nameof(url));
             ServerPassword = password ?? throw new ArgumentNullException(nameof(password));
 
+            Contact = new ContactImpl(this);
             General = new GeneralImpl(this);
             MacOS = new MacOSImpl(this);
             Server = new ServerImpl(this);
@@ -58,6 +59,10 @@ namespace BlueBubbles.API
         /// </summary>
         public string ServerPassword { get; set; }
 
+        /// <summary>
+        /// Gets the Contact API interface.
+        /// </summary>
+        public IContact Contact { get; }
         /// <summary>
         /// Gets the General API interface.
         /// </summary>

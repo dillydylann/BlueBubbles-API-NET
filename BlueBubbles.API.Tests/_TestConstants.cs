@@ -8,5 +8,8 @@ namespace BlueBubbles.API.Tests
     {
         public const string ServerUrl = "";
         public const string ServerPassword = "";
+
+        // Contact tests
+        public static readonly string[] ContactQueryTestAddresses = {};
     }
 }
