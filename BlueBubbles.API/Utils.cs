@@ -78,29 +78,40 @@ namespace BlueBubbles.API
                 foreach (var prop in obj.GetType().GetProperties())
                 {
                     var name = CamelCaseNaming.GetPropertyName(prop.Name, false);
+                    var isBinary = prop.PropertyType == typeof(Stream) || prop.PropertyType == typeof(byte[]);
 
                     // Content header
-                    writer.WriteLine(boundary);
-                    writer.WriteLine($"Content-Disposition: form-data; name=\"{name}\"");
+                    writer.WriteLine($"--{boundary}");
+                    writer.WriteLine($"Content-Disposition: form-data; name=\"{name}\"" + (isBinary ? "; filename=\"\"" : string.Empty));
+                    if (isBinary)
+                    {
+                        writer.WriteLine("Content-Type: application/octet-stream");
+                    }
+
                     writer.WriteLine();
+                    writer.Flush();
 
                     if (prop.PropertyType == typeof(Stream))
                     {
                         var stream = prop.GetValue(obj) as Stream;
                         stream.CopyTo(output);
+                        output.Flush();
                     }
                     else if (prop.PropertyType == typeof(byte[]))
                     {
                         var bytes = prop.GetValue(obj) as byte[];
                         output.Write(bytes, 0, bytes.Length);
+                        output.Flush();
                     }
                     else
                     {
-                        writer.WriteLine(prop.GetValue(obj));
+                        writer.Write(prop.GetValue(obj));
                     }
+
+                    writer.WriteLine();
                 }
 
-                writer.Write(boundary + "--");
+                writer.Write($"--{boundary}--");
             }
         }
     }

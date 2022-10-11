@@ -120,7 +120,6 @@ namespace BlueBubbles.API
 
             if (body != null)
             {
-                webReq.ContentType = "application/json";
                 using (var writer = new StreamWriter(webReq.GetRequestStream()))
                 {
                     switch (contentType)
