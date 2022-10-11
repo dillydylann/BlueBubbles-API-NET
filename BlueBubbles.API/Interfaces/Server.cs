@@ -42,10 +42,10 @@ namespace BlueBubbles.API.Interfaces
         /// Requests with <c>GET /api/v1/server/restart/soft</c>.
         /// </remarks>
         /// <returns>A response with no data.</returns>
-        APIResponse<object> RestartServices();
+        APIResponse RestartServices();
 
         /// <inheritdoc cref="RestartServices"/>
-        Task<APIResponse<object>> RestartServicesAsync();
+        Task<APIResponse> RestartServicesAsync();
 
         /// <summary>
         /// Restarts the entire server process (hard restart).
@@ -54,10 +54,10 @@ namespace BlueBubbles.API.Interfaces
         /// Requests with <c>GET /api/v1/server/restart/hard</c>.
         /// </remarks>
         /// <returns>A response with no data.</returns>
-        APIResponse<object> RestartAll();
+        APIResponse RestartAll();
 
         /// <inheritdoc cref="RestartAll"/>
-        Task<APIResponse<object>> RestartAllAsync();
+        Task<APIResponse> RestartAllAsync();
 
         /// <summary>
         /// Fetches alerts from the server.
@@ -80,10 +80,10 @@ namespace BlueBubbles.API.Interfaces
         /// </remarks>
         /// <param name="request">The parameters for this request.</param>
         /// <returns>A response with no data.</returns>
-        APIResponse<object> MarkAlertsAsRead(ServerMarkAlertsAsReadRequest request);
+        APIResponse MarkAlertsAsRead(ServerMarkAlertsAsReadRequest request);
 
         /// <inheritdoc cref="GetAlerts"/>
-        Task<APIResponse<object>> MarkAlertsAsReadAsync(ServerMarkAlertsAsReadRequest request);
+        Task<APIResponse> MarkAlertsAsReadAsync(ServerMarkAlertsAsReadRequest request);
 
         /// <summary>
         /// Fetches the database totals for the iMessage entities.
@@ -149,25 +149,25 @@ namespace BlueBubbles.API.Interfaces
         public Task<APIResponse<string>> GetLogsAsync()
             => client.RequestGetAsync<string>(GetLogsUrlPath);
 
-        public APIResponse<object> RestartServices()
-            => client.RequestGet<object>(RestartServicesUrlPath);
-        public Task<APIResponse<object>> RestartServicesAsync()
-            => client.RequestGetAsync<object>(RestartServicesUrlPath);
+        public APIResponse RestartServices()
+            => client.RequestGet(RestartServicesUrlPath);
+        public Task<APIResponse> RestartServicesAsync()
+            => client.RequestGetAsync(RestartServicesUrlPath);
 
-        public APIResponse<object> RestartAll()
-            => client.RequestGet<object>(RestartAllUrlPath);
-        public Task<APIResponse<object>> RestartAllAsync()
-            => client.RequestGetAsync<object>(RestartAllUrlPath);
+        public APIResponse RestartAll()
+            => client.RequestGet(RestartAllUrlPath);
+        public Task<APIResponse> RestartAllAsync()
+            => client.RequestGetAsync(RestartAllUrlPath);
 
         public APIResponse<ServerAlert[]> GetAlerts()
             => client.RequestGet<ServerAlert[]>(GetAlertsUrlPath);
         public Task<APIResponse<ServerAlert[]>> GetAlertsAsync()
             => client.RequestGetAsync<ServerAlert[]>(GetAlertsUrlPath);
 
-        public APIResponse<object> MarkAlertsAsRead(ServerMarkAlertsAsReadRequest request)
-            => client.RequestPost<object, ServerMarkAlertsAsReadRequest>(MarkAlertsAsReadUrlPath, request);
-        public Task<APIResponse<object>> MarkAlertsAsReadAsync(ServerMarkAlertsAsReadRequest request)
-            => client.RequestPostAsync<object, ServerMarkAlertsAsReadRequest>(MarkAlertsAsReadUrlPath, request);
+        public APIResponse MarkAlertsAsRead(ServerMarkAlertsAsReadRequest request)
+            => client.RequestPost<ServerMarkAlertsAsReadRequest>(MarkAlertsAsReadUrlPath, request);
+        public Task<APIResponse> MarkAlertsAsReadAsync(ServerMarkAlertsAsReadRequest request)
+            => client.RequestPostAsync<ServerMarkAlertsAsReadRequest>(MarkAlertsAsReadUrlPath, request);
 
         public APIResponse<ServerStatTotalsResponse> GetStatTotals()
             => client.RequestGet<ServerStatTotalsResponse>(GetStatTotalsUrlPath);

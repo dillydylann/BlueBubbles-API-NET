@@ -17,10 +17,10 @@ namespace BlueBubbles.API.Interfaces
         /// Requests with <c>POST /api/v1/mac/lock</c>.
         /// </remarks>
         /// <returns>A response with no data.</returns>
-        APIResponse<object> Lock();
+        APIResponse Lock();
 
         /// <inheritdoc cref="Lock"/>
-        Task<APIResponse<object>> LockAsync();
+        Task<APIResponse> LockAsync();
 
         /// <summary>
         /// Restarts the Messages app on the server.
@@ -29,10 +29,10 @@ namespace BlueBubbles.API.Interfaces
         /// Requests with <c>POST /api/v1/mac/imessage/restart</c>.
         /// </remarks>
         /// <returns>A response with no data.</returns>
-        APIResponse<object> RestartMessagesApp();
+        APIResponse RestartMessagesApp();
 
         /// <inheritdoc cref="RestartMessagesApp"/>
-        Task<APIResponse<object>> RestartMessagesAppAsync();
+        Task<APIResponse> RestartMessagesAppAsync();
     }
 
 #pragma warning disable SA1600
@@ -44,15 +44,15 @@ namespace BlueBubbles.API.Interfaces
         private BlueBubblesClient client;
         public MacOSImpl(BlueBubblesClient c) => client = c;
 
-        public APIResponse<object> Lock()
-            => client.RequestPost<object>(LockUrlPath);
-        public Task<APIResponse<object>> LockAsync()
-            => client.RequestPostAsync<object>(LockUrlPath);
+        public APIResponse Lock()
+            => client.RequestPost(LockUrlPath);
+        public Task<APIResponse> LockAsync()
+            => client.RequestPostAsync(LockUrlPath);
 
-        public APIResponse<object> RestartMessagesApp()
-            => client.RequestPost<object>(RestartMessagesAppUrlPath);
-        public Task<APIResponse<object>> RestartMessagesAppAsync()
-            => client.RequestPostAsync<object>(RestartMessagesAppUrlPath);
+        public APIResponse RestartMessagesApp()
+            => client.RequestPost(RestartMessagesAppUrlPath);
+        public Task<APIResponse> RestartMessagesAppAsync()
+            => client.RequestPostAsync(RestartMessagesAppUrlPath);
     }
 #pragma warning restore SA1600
 }

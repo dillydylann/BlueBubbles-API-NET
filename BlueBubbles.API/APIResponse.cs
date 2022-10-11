@@ -26,8 +26,7 @@ namespace BlueBubbles.API
     /// <summary>
     /// Represents a response object from a request.
     /// </summary>
-    /// <typeparam name="TData">The type to use for the response model.</typeparam>
-    public sealed class APIResponse<TData>
+    public class APIResponse
     {
         /// <summary>
         /// Gets the response status code.
@@ -38,11 +37,6 @@ namespace BlueBubbles.API
         /// Gets the response message.
         /// </summary>
         public string Message { get; internal set; }
-
-        /// <summary>
-        /// Gets the response data.
-        /// </summary>
-        public TData Data { get; internal set; }
 
         /// <summary>
         /// Gets the response error.
@@ -60,5 +54,25 @@ namespace BlueBubbles.API
         /// </summary>
         [JsonIgnore]
         public string RawJson { get; internal set; }
+    }
+
+    /// <typeparam name="TData">The type to use for the response model data.</typeparam>
+    /// <inheritdoc cref="APIResponse"/>
+    public class APIResponse<TData> : APIResponse
+    {
+        /// <summary>
+        /// Gets the response data.
+        /// </summary>
+        public TData Data { get; internal set; }
+    }
+
+    /// <typeparam name="TMetadata">The type to use for the response model metadata.</typeparam>
+    /// <inheritdoc cref="APIResponse{TData}"/>
+    public class APIResponse<TData, TMetadata> : APIResponse<TData>
+    {
+        /// <summary>
+        /// Gets the response metadata.
+        /// </summary>
+        public TMetadata Metadata { get; internal set; }
     }
 }

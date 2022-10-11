@@ -100,7 +100,8 @@ namespace BlueBubbles.API
         /// <summary>
         /// Initiates a synchronous request to the BlueBubbles server.
         /// </summary>
-        /// <typeparam name="TResponse">The type to use for the response model.</typeparam>
+        /// <typeparam name="TData">The type to use for the response model data.</typeparam>
+        /// <typeparam name="TMetadata">The type to use for the response model metadata.</typeparam>
         /// <typeparam name="TBody">The type to use for the request model.</typeparam>
         /// <param name="method">The protocol method to use.</param>
         /// <param name="path">The path URL for the request.</param>
@@ -112,9 +113,9 @@ namespace BlueBubbles.API
         /// <param name="contentType">The body content type.</param>
         /// <returns>
         /// A response object containing the HTTP status code, a status message,
-        /// the <typeparamref name="TResponse"/> data, and an error object if failed.
+        /// the <typeparamref name="TData"/> data, and an error object if failed.
         /// </returns>
-        public APIResponse<TResponse> Request<TResponse, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        public APIResponse<TData, TMetadata> Request<TData, TMetadata, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
         {
             HttpWebRequest webReq = CreateRequest(method, path, query);
 
@@ -174,84 +175,232 @@ namespace BlueBubbles.API
             using (var reader = new StreamReader(webResp.GetResponseStream()))
             {
                 string json = reader.ReadToEnd();
-                var resp = JsonConvert.DeserializeObject<APIResponse<TResponse>>(json, SerializerSettings);
+                var resp = JsonConvert.DeserializeObject<APIResponse<TData, TMetadata>>(json, SerializerSettings);
                 resp.Exception = exception;
                 resp.RawJson = json;
                 return resp;
             }
         }
 
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> Request<TData, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        {
+            return Request<TData, object, TBody>(method, path, query, body, contentType);
+        }
+
+        /// <inheritdoc cref="Request"/>
+        public APIResponse Request<TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        {
+            return Request<object, object, TBody>(method, path, query, body, contentType);
+        }
+
         /// <summary>
         /// Initiates an asynchronous request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestAsync<TResponse, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        public Task<APIResponse<TData, TMetadata>> RequestAsync<TData, TMetadata, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
         {
-            return Task.Run(() => Request<TResponse, TBody>(method, path, query, body, contentType));
+            return Task.Run(() => Request<TData, TMetadata, TBody>(method, path, query, body, contentType));
+        }
+
+        /// <inheritdoc cref="RequestAsync"/>
+        public async Task<APIResponse<TData>> RequestAsync<TData, TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        {
+            var task = RequestAsync<TData, object, TBody>(method, path, query, body, contentType);
+            await task.ConfigureAwait(false);
+            return task.Result;
+        }
+
+        /// <inheritdoc cref="RequestAsync"/>
+        public async Task<APIResponse> RequestAsync<TBody>(string method, string path, string query, TBody body, string contentType = DefaultContentType)
+        {
+            var task = RequestAsync<object, object, TBody>(method, path, query, body, contentType);
+            await task.ConfigureAwait(false);
+            return task.Result;
         }
 
         /// <summary>
         /// Initiates a synchronous <c>GET</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestGet<TResponse>(string path, string query = null) => Request<TResponse, object>("GET", path, query, null);
+        public APIResponse RequestGet(string path, string query = null) => Request<object>("GET", path, query, null);
         /// <summary>
         /// Initiates an asynchronous <c>GET</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestGetAsync<TResponse>(string path, string query = null) => RequestAsync<TResponse, object>("GET", path, query, null);
+        public Task<APIResponse> RequestGetAsync(string path, string query = null) => RequestAsync<object>("GET", path, query, null);
+        /// <summary>
+        /// Initiates a synchronous <c>GET</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestGet<TData>(string path, string query = null) => Request<TData, object>("GET", path, query, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>GET</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestGetAsync<TData>(string path, string query = null) => RequestAsync<TData, object>("GET", path, query, null);
+        /// <summary>
+        /// Initiates a synchronous <c>GET</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestGet<TData, TMetadata>(string path, string query = null) => Request<TData, TMetadata, object>("GET", path, query, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>GET</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestGetAsync<TData, TMetadata>(string path, string query = null) => RequestAsync<TData, TMetadata, object>("GET", path, query, null);
 
         /// <summary>
         /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPost<TResponse>(string path) => Request<TResponse, object>("POST", path, null, null);
+        public APIResponse RequestPost(string path) => Request<object>("POST", path, null, null);
         /// <summary>
         /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPostAsync<TResponse>(string path) => RequestAsync<TResponse, object>("POST", path, null, null);
+        public Task<APIResponse> RequestPostAsync(string path) => RequestAsync<object>("POST", path, null, null);
         /// <summary>
         /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPost<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TResponse, TBody>("POST", path, null, body, contentType);
+        public APIResponse RequestPost<TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TBody>("POST", path, null, body, contentType);
         /// <summary>
         /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPostAsync<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TResponse, TBody>("POST", path, null, body, contentType);
+        public Task<APIResponse> RequestPostAsync<TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TBody>("POST", path, null, body, contentType);
+        /// <summary>
+        /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestPost<TData>(string path) => Request<TData, object>("POST", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestPostAsync<TData>(string path) => RequestAsync<TData, object>("POST", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestPost<TData, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TData, TBody>("POST", path, null, body, contentType);
+        /// <summary>
+        /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestPostAsync<TData, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TData, TBody>("POST", path, null, body, contentType);
+        /// <summary>
+        /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestPost<TData, TMetadata>(string path) => Request<TData, TMetadata, object>("POST", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestPostAsync<TData, TMetadata>(string path) => RequestAsync<TData, TMetadata, object>("POST", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestPost<TData, TMetadata, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TData, TMetadata, TBody>("POST", path, null, body, contentType);
+        /// <summary>
+        /// Initiates an asynchronous <c>POST</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestPostAsync<TData, TMetadata, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TData, TMetadata, TBody>("POST", path, null, body, contentType);
 
         /// <summary>
         /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPut<TResponse>(string path) => Request<TResponse, object>("PUT", path, null, null);
+        public APIResponse RequestPut(string path) => Request<object>("PUT", path, null, null);
         /// <summary>
         /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPutAsync<TResponse>(string path) => RequestAsync<TResponse, object>("PUT", path, null, null);
+        public Task<APIResponse> RequestPutAsync(string path) => RequestAsync<object>("PUT", path, null, null);
         /// <summary>
         /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestPut<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TResponse, TBody>("PUT", path, null, body, contentType);
+        public APIResponse RequestPut<TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TBody>("PUT", path, null, body, contentType);
         /// <summary>
         /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestPutAsync<TResponse, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TResponse, TBody>("PUT", path, null, body, contentType);
+        public Task<APIResponse> RequestPutAsync<TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TBody>("PUT", path, null, body, contentType);
+        /// <summary>
+        /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestPut<TData>(string path) => Request<TData, object>("PUT", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestPutAsync<TData>(string path) => RequestAsync<TData, object>("PUT", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestPut<TData, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TData, TBody>("PUT", path, null, body, contentType);
+        /// <summary>
+        /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestPutAsync<TData, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TData, TBody>("PUT", path, null, body, contentType);
+        /// <summary>
+        /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestPut<TData, TMetadata>(string path) => Request<TData, TMetadata, object>("PUT", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestPutAsync<TData, TMetadata>(string path) => RequestAsync<TData, TMetadata, object>("PUT", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestPut<TData, TMetadata, TBody>(string path, TBody body, string contentType = DefaultContentType) => Request<TData, TMetadata, TBody>("PUT", path, null, body, contentType);
+        /// <summary>
+        /// Initiates an asynchronous <c>PUT</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestPutAsync<TData, TMetadata, TBody>(string path, TBody body, string contentType = DefaultContentType) => RequestAsync<TData, TMetadata, TBody>("PUT", path, null, body, contentType);
 
         /// <summary>
         /// Initiates a synchronous <c>DELETE</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public APIResponse<TResponse> RequestDelete<TResponse>(string path) => Request<TResponse, object>("DELETE", path, null, null);
+        public APIResponse RequestDelete(string path) => Request<object>("DELETE", path, null, null);
         /// <summary>
         /// Initiates an asynchronous <c>DELETE</c> request to the BlueBubbles server.
         /// </summary>
         /// <inheritdoc cref="Request"/>
-        public Task<APIResponse<TResponse>> RequestDeleteAsync<TResponse>(string path) => RequestAsync<TResponse, object>("DELETE", path, null, null);
+        public Task<APIResponse> RequestDeleteAsync(string path) => RequestAsync<object>("DELETE", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData> RequestDelete<TData>(string path) => Request<TData, object>("DELETE", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData>> RequestDeleteAsync<TData>(string path) => RequestAsync<TData, object>("DELETE", path, null, null);
+        /// <summary>
+        /// Initiates a synchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public APIResponse<TData, TMetadata> RequestDelete<TData, TMetadata>(string path) => Request<TData, TMetadata, object>("DELETE", path, null, null);
+        /// <summary>
+        /// Initiates an asynchronous <c>DELETE</c> request to the BlueBubbles server.
+        /// </summary>
+        /// <inheritdoc cref="Request"/>
+        public Task<APIResponse<TData, TMetadata>> RequestDeleteAsync<TData, TMetadata>(string path) => RequestAsync<TData, TMetadata, object>("DELETE", path, null, null);
     }
 }

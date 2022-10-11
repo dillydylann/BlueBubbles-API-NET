@@ -7,7 +7,7 @@ namespace BlueBubbles.API.Tests
 {
     public static class TestUtils
     {
-        public static void VerifyResponse<T>(APIResponse<T> resp)
+        public static void VerifyResponse(APIResponse resp)
         {
             // Ehh...a normal user would be using PrivateAPIEnabled and HelperConnected in
             // Server.GetInfo() instead of this mess...
