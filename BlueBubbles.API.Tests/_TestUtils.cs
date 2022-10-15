@@ -2,6 +2,7 @@
 // Copyright (c) 2022 Dylan Briedis <dylan@dylanbriedis.com>
 
 using System.Diagnostics;
+using BlueBubbles.API.Models;
 
 namespace BlueBubbles.API.Tests
 {
@@ -27,6 +28,13 @@ namespace BlueBubbles.API.Tests
             Debug.WriteLine($"Raw JSON: {resp.RawJson}");
 
             Assert.AreEqual(resp.Status, HttpStatusCode.OK);
+        }
+
+        public static void PrintQueryMetadata(QueryMetadata metadata)
+        {
+            Console.WriteLine($"Query limit: {metadata.Limit}");
+            Console.WriteLine($"Query offset: {metadata.Offset}");
+            Console.WriteLine($"Query total: {metadata.Total}");
         }
     }
 }

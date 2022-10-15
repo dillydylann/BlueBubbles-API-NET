@@ -3,3 +3,7 @@
 
 global using System.Net;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+global using static BlueBubbles.API.Tests.ChatTests;
+global using static BlueBubbles.API.Tests.HandleTests;
+global using static BlueBubbles.API.Tests.MessageTests;

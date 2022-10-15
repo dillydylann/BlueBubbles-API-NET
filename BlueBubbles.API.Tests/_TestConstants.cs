@@ -9,7 +9,21 @@ namespace BlueBubbles.API.Tests
         public const string ServerUrl = "";
         public const string ServerPassword = "";
 
+        // Attachment tests
+        public const string AttachmentTestGuid = "";
+
         // Contact tests
         public static readonly string[] ContactQueryTestAddresses = {};
+
+        // Chat tests
+        public const string ChatCreateTestAddress = "";
+        public const string ChatTestGuid = "";
+
+        // Handle tests
+        public const string HandleTestAddress = "";
+
+        // Message tests
+        public const string MessageTestChatGuid = "";
+        public const string MessageTestGuid = "";
     }
 }

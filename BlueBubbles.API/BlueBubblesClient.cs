@@ -36,9 +36,13 @@ namespace BlueBubbles.API
             ServerUrl = url ?? throw new ArgumentNullException(nameof(url));
             ServerPassword = password ?? throw new ArgumentNullException(nameof(password));
 
+            Attachment = new AttachmentImpl(this);
+            Chat = new ChatImpl(this);
             Contact = new ContactImpl(this);
             General = new GeneralImpl(this);
+            Handle = new HandleImpl(this);
             MacOS = new MacOSImpl(this);
+            Message = new MessageImpl(this);
             Server = new ServerImpl(this);
         }
 
@@ -60,6 +64,14 @@ namespace BlueBubbles.API
         public string ServerPassword { get; set; }
 
         /// <summary>
+        /// Gets the Attachment API interface.
+        /// </summary>
+        public IAttachment Attachment { get; }
+        /// <summary>
+        /// Gets the Chat API interface.
+        /// </summary>
+        public IChat Chat { get; }
+        /// <summary>
         /// Gets the Contact API interface.
         /// </summary>
         public IContact Contact { get; }
@@ -68,9 +80,17 @@ namespace BlueBubbles.API
         /// </summary>
         public IGeneral General { get; }
         /// <summary>
+        /// Gets the Handle API interface.
+        /// </summary>
+        public IHandle Handle { get; }
+        /// <summary>
         /// Gets the MacOS API interface.
         /// </summary>
         public IMacOS MacOS { get; }
+        /// <summary>
+        /// Gets the Message API interface.
+        /// </summary>
+        public IMessage Message { get; }
         /// <summary>
         /// Gets the Server API interface.
         /// </summary>
