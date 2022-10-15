@@ -15,7 +15,7 @@ namespace BlueBubbles.API.Models.Handle
         /// <summary>
         /// Initializes a new instance of the <see cref="HandleQueryRequest"/> class.
         /// </summary>
-        public HandleQueryRequest() { }
+        public HandleQueryRequest() { Offset = 0; }
 
         /// <summary>
         /// Gets or sets the address to query.
