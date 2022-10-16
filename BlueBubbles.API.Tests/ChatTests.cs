@@ -130,6 +130,10 @@ namespace BlueBubbles.API.Tests
         public static void PrintChat(ChatEntity chat)
         {
             Console.WriteLine($"GUID: {chat.Guid}");
+            foreach (var handle in chat.Participants)
+            {
+                PrintHandle(handle);
+            }
             if (chat.LastMessage != null)
             {
                 Console.WriteLine($"Last message: {chat.LastMessage.Text}");
