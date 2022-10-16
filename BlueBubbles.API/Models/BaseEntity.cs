@@ -2,6 +2,7 @@
 // Copyright (c) 2022 Dylan Briedis <dylan@dylanbriedis.com>
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace BlueBubbles.API.Models
@@ -16,6 +17,10 @@ namespace BlueBubbles.API.Models
         /// </summary>
         [JsonProperty("originalROWID")]
         public int OriginalRowId { get; private set; }
+
+        public static bool operator ==(BaseEntity left, BaseEntity right) => EqualityComparer<BaseEntity>.Default.Equals(left, right);
+
+        public static bool operator !=(BaseEntity left, BaseEntity right) => !(left == right);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as BaseEntity);
