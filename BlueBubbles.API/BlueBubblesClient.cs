@@ -146,7 +146,7 @@ namespace BlueBubbles.API
                     switch (contentType)
                     {
                         case "application/json":
-                    writer.Write(JsonConvert.SerializeObject(body, SerializerSettings));
+                            writer.Write(JsonConvert.SerializeObject(body, SerializerSettings));
                             break;
 
                         case "multipart/form-data":
