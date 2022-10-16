@@ -8,10 +8,16 @@
 
   <PropertyGroup>
     <Title>BlueBubbles API for .NET</Title>
-    <Description>A client library for sending and receiving iMessages from and to a BlueBubbles server.</Description>
+    <Summary>A client library for sending and receiving iMessages from and to a BlueBubbles server.</Summary>
+    <Description>$(Summary)</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
 		<PackageReference Include="JsonNet.ContractResolvers" Version="2.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">

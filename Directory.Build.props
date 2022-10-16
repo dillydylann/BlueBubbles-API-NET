@@ -4,9 +4,18 @@
     <Authors>Dylan Briedis</Authors>
     <Product>BlueBubbles API for .NET</Product>
     <Copyright>Copyright © 2022 Dylan Briedis</Copyright>
+    <PackageIcon>PackageIcon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/dillydylann/BlueBubbles-API-NET</RepositoryUrl>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Assets\icon-128.png" Pack="true" PackagePath="PackageIcon.png" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+  </ItemGroup>
+
   <PropertyGroup>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
